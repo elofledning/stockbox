@@ -1,0 +1,26 @@
+######## npm #########
+npm list --depth 0
+npm init
+npm install lambda-local --save
+npm install serverless --save
+npm install dynamodb-doc --save
+
+######### app #########
+lambda-local -l timeseries.js -h persistHandler -e timeseries.js
+
+######### dynamoDB ########### 
+docker run -p 8000:8000 amazon/dynamodb-local -sharedDb -dbPath /db
+aws configure -> credetials: foo/bar  region: local output:json
+aws dynamodb create-table --cli-input-json file://create-table-timeseries.json --endpoint-url http://localhost:8000
+
+aws dynamodb list-tables --endpoint-url http://localhost:8000
+aws dynamodb scan --table-name timeseries --endpoint-url http://localhost:8000
+aws dynamodb describe-table --table-name timeseries --endpoint-url http://localhost:8000
+aws dynamodb delete-table --table-name timeseries --endpoint-url http://localhost:8000
+
+aws dynamodb put-item --table-name timeseries --item '{"symbol":{"S":"EA"},"timeday":{"S":"2019-01-11"},"open":{"S":"90.6700"},"close":{"S":"90.7000"}}' --endpoint-url http://localhost:8000
+
+npm install dynamodb-admin -g
+export DYNAMO_ENDPOINT=http://localhost:8000
+dynamodb-admin
+--> http://localhost:8001

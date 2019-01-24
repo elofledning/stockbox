@@ -1,0 +1,15 @@
+{
+  "TableName": "timeseries",
+  "KeySchema": [
+    { "AttributeName": "symbol", "KeyType": "HASH" },
+    { "AttributeName": "timeday", "KeyType": "RANGE" }
+  ],
+  "AttributeDefinitions": [
+    { "AttributeName": "symbol", "AttributeType": "S" },
+    { "AttributeName": "timeday", "AttributeType": "S" }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 5,
+    "WriteCapacityUnits": 5
+  }
+}
