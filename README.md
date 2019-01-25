@@ -1,1 +1,1 @@
-# stockbox
+# Stockbox - Technical analysis based stock predictions
