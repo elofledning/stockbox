@@ -15,16 +15,16 @@ const apiFunction = 'TIME_SERIES_DAILY';
 module.exports.persistHandler = (event, context, callback) => {
     console.info("Request received:\n", JSON.stringify(event));
     console.info("Context received:\n", JSON.stringify(context));
-  
+
     let symbol = 'CRM';
     let ts = new Date().getTime();
 
     //scan();
     //Retrieve and process API data synchronously
-    processData(baseUrl+'function='+apiFunction+'&symbol='+symbol+'&apikey='+apiKey);  
+    processData(baseUrl + 'function=' + apiFunction + '&symbol=' + symbol + '&apikey=' + apiKey);
 
     //Gets JSON string from url API defined
-    function processData(url){
+    function processData(url) {
         https.get(url, (resp) => {
             let data = '';
 
@@ -35,35 +35,35 @@ module.exports.persistHandler = (event, context, callback) => {
 
             // The whole response has been received.
             resp.on('end', () => {
-                console.log('End of API request for URL: '+url+'. Data: '+data.length);
+                console.log('End of API request for URL: ' + url + '. Data: ' + data.length);
                 persist(getParams(data));
             });
 
-            }).on("error", (err) => {
-                let errMsg = "Error: " + err.message;
-                console.log(errMsg);
-                callback(errMsg);
+        }).on("error", (err) => {
+            let errMsg = "Error: " + err.message;
+            console.log(errMsg);
+            callback(errMsg);
         });
     }
 
-    function getParams(jsonResult){
-        try{
+    function getParams(jsonResult) {
+        try {
             let objRoot = JSON.parse(jsonResult);
-            let timeIndex = jsonObjToIndex(objRoot['Time\u0020Series\u0020(Daily)'], 10);  
+            let timeIndex = jsonObjToIndex(objRoot['Time\u0020Series\u0020(Daily)'], 10);
             let paramItems = [];
 
             //loops "Time Series (Daily)"
-            timeIndex.forEach(function(value){
+            timeIndex.forEach(function (value) {
                 paramItems.push({
                     PutRequest: {
-                    Item: {
-                            symbol: symbol, 
-                            timeday: value.timeDay, 
+                        Item: {
+                            symbol: symbol,
+                            timeday: value.timeDay,
                             open: value['1.\u0020open'],
                             close: value['4.\u0020close']
-                          }
+                        }
                     }
-                });    
+                });
             });
             let params = {
                 RequestItems: {
@@ -72,68 +72,68 @@ module.exports.persistHandler = (event, context, callback) => {
             };
             return params;
 
-        }catch(err){
-            var errMsg = 'JSON.parse ERROR: '+err;
+        } catch (err) {
+            var errMsg = 'JSON.parse ERROR: ' + err;
             console.log(errMsg)
             callback(errMsg);
         }
     }
 
-    function persist(params){
-        
-        doc.batchWrite(params, function(err, data) {
+    function persist(params) {
+
+        doc.batchWrite(params, function (err, data) {
             if (err) {
-              console.log('Error put Item: '+err);
-              callback(err);
+                console.log('Error put Item: ' + err);
+                callback(err);
             } else {
-              console.log('Data Success put Items. ', JSON.stringify(data));
-              callback(null, "Callback success for lambda function timeseries.js");
+                console.log('Data Success put Items. ', JSON.stringify(data));
+                callback(null, "Callback success for lambda function timeseries.js");
             }
         });
 
-      }
+    }
 
-      function jsonObjToIndex(obj, max){
+    function jsonObjToIndex(obj, max) {
         var index = [];
         var count = 0;
-      
+
         // build the index
         for (var key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            var singleObj = obj[key];
-            singleObj.timeDay = key;
-            index.push(singleObj);
-          }
-          count++;
-      
-          if(count>=max){
-            break;
-          }
+            if (obj.hasOwnProperty(key)) {
+                var singleObj = obj[key];
+                singleObj.timeDay = key;
+                index.push(singleObj);
+            }
+            count++;
+
+            if (count >= max) {
+                break;
+            }
         }
         return index;
-      }
+    }
 
-      function showKeysJSONObj(p){
+    function showKeysJSONObj(p) {
         for (var key in p) {
-          if (p.hasOwnProperty(key)) {
-              console.log(key + " -> " + p[key]);
-          }
+            if (p.hasOwnProperty(key)) {
+                console.log(key + " -> " + p[key]);
+            }
         }
-      }
+    }
 
-      function scan(){
+    function scan() {
         const params = {
             TableName: config.aws_table_name
-          };
-          doc.scan(params, function(err, data) {
+        };
+        doc.scan(params, function (err, data) {
             if (err) {
                 let errMsg = "Error: " + err.message;
                 console.log(errMsg);
                 callback(errMsg);
             } else {
-              const { Items } = data;
-              console.log('ITEMS: '+JSON.stringify(Items));
-              callback(null, "Callback success for lambda function timeseries.js");
+                const { Items } = data;
+                console.log('ITEMS: ' + JSON.stringify(Items));
+                callback(null, "Callback success for lambda function timeseries.js");
             }
         });
     }

@@ -1,9 +1,13 @@
 ######## npm #########
 npm list --depth 0
-npm init
+
+npm install
+npm install aws-sdk --save
 npm install lambda-local --save
 npm install serverless --save
 npm install dynamodb-doc --save
+
+npm install eslint
 
 ######### app #########
 lambda-local -l timeseries.js -h persistHandler -e timeseries.js
