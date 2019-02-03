@@ -11,9 +11,10 @@ npm install eslint
 
 ######### app #########
 lambda-local -l timeseries.js -h persistHandler -e timeseries.js
+lambda-local -l obv.js -h persistHandler -e obv.js
 
 ######### dynamoDB ########### 
-docker run -p 8000:8000 amazon/dynamodb-local -sharedDb -dbPath /db
+docker run -p 8000:8000 amazon/dynamodb-local
 aws configure -> credetials: foo/bar  region: local output:json
 aws dynamodb create-table --cli-input-json file://create-table-timeseries.json --endpoint-url http://localhost:8000
 

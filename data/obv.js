@@ -8,8 +8,8 @@ module.exports.persistHandler = (event, context, callback) => {
     let symbol = 'MSFT';
 
     //Retrieve and process API data 
-    //https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo
-    processData(config.base_api_url + 'function=' + config.api_function_timeseries_daily + '&symbol=' + symbol + '&apikey=' + config.api_key);
+    //https://www.alphavantage.co/query?function=OBV&symbol=MSFT&interval=weekly&apikey=demo
+    processData(config.base_api_url + 'function=' + config.api_function_obv + '&symbol=' + symbol + '&interval=daily' + '&apikey=' + config.api_key);
 
     //Gets JSON string from url API defined
     function processData(url) {
@@ -38,18 +38,17 @@ module.exports.persistHandler = (event, context, callback) => {
     function buildParams(jsonResult) {
         try {
             let objRoot = JSON.parse(jsonResult);
-            let timeIndex = util.getTimeDayJSON(objRoot['Time\u0020Series\u0020(Daily)'], 10);
+            let timeIndex = util.getTimeDayJSON(objRoot['Technical Analysis: OBV'], 10);
             let paramItems = [];
 
-            //loops "Time Series (Daily)"
+            //loops "Technical Analysis: OBV"
             timeIndex.forEach(function (value) {
                 paramItems.push({
                     PutRequest: {
                         Item: {
                             symbol: symbol,
                             timeday: value.timeDay,
-                            open: value['1.\u0020open'],
-                            close: value['4.\u0020close']
+                            obv: value['OBV']
                         }
                     }
                 });
