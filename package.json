@@ -9,7 +9,7 @@
   "author": "Kim Dyrholm Kristiansen",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.395.0",
+    "aws-sdk": "^2.814.0",
     "eslint": "^5.12.1",
     "lambda-local": "^1.5.2",
     "serverless": "^1.36.3"
